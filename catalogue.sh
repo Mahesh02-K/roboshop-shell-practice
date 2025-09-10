@@ -50,10 +50,21 @@ id roboshop
 if [ $? -ne 0 ]
 then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
-    VERIFY $? "Creating roboshop system user"
+    VALIDATE $? "Creating roboshop system user"
 else
-    echo -e "Roboshop user is "$Y Already Created $N" 
+    echo -e "System user roboshop already created ... $Y SKIPPING $N"
 fi
+
+#getting error if we use Below commented syntax instead of above syntax
+# id roboshop
+# if [ $? -ne 0 ]
+# then 
+#     echo -e "Roboshop user is $R Not Created $Y" | tee -a $LOG_FILE
+#     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+#     VERIFY $? "Creating roboshop system user"
+# else
+#     echo -e "Roboshop user is "$Y Already Created $N" | tee -a $LOG_FILE
+# fi
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
 VERIFY $? "Downloading Catalogue"
