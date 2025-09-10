@@ -48,12 +48,11 @@ VERIFY $? "Creating app directory"
 
 id roboshop
 if [ $? -ne 0 ]
-then 
-    echo -e "Roboshop user is $R Not Created $Y" | tee -a $LOG_FILE
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
     VERIFY $? "Creating roboshop system user"
 else
-    echo -e "Roboshop user is "$Y Already Created $N" | tee -a $LOG_FILE
+    echo -e "Roboshop user is "$Y Already Created $N" 
 fi
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
@@ -91,4 +90,4 @@ fi
 END_TIME=$(date +%s)
 TOTAL_TIME=$(($END_TIME - $START_TIME))
 
-echo -e "Script execution completed successfully, $Y Time taken = $TOTAL_TIME $N secs " | tee -a $LOG_FILE
+echo -e "Script execution completed successfully, $Y Time taken = $TOTAL_TIME $N secs" | tee -a $LOG_FILE
