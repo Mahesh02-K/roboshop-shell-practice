@@ -14,40 +14,31 @@ LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 mkdir -p $LOGS_FOLDER
 echo -e "Script started executing at : $Y $(date) $N" | tee -a $LOG_FILE
 
-#check root priveleges
+#check root previleges
 if [ $USERID -ne 0 ]
 then
     echo -e "$R ERROR ::: $N PLEASE RUN WITH ROOT ACCESS" | tee -a $LOG_FILE
     exit 1 #give other than 0 upto 127
-else 
-    echo -e "$G PROCEED ::: $N You are running with root access" | tee -a $LOG_FILE
-fi 
+else
+    echo -e "$G SUCCESS ::: $N YOU ARE RUNNING WITH ROOT ACCESS" | tee -a $LOG_FILE
+fi
 
 VERIFY(){
     if [ $1 -eq 0 ]
     then
         echo -e "$2 is ... $G SUCCESS $N" | tee -a $LOG_FILE
-    else 
-        echo -e "$2 is ... $R FAILURE $N" | tee -a $LOG_FILE
+    else
+        echo -e "$2 is ... $G FAILURE $N" | tee -a $LOG_FILE
         exit 1 #give other than 0 upto 127
     fi
 }
 
-dnf module disable redis -y &>>$LOG_FILE
-VERIFY $? "Disabling default redis"
+dnf install mysql-server -y &>>$LOG_FILE
+VERIFY $? "Installing mysql" 
 
-dnf module enable redis:7 -y &>>$LOG_FILE
-VERIFY $? "Enabling redis:7"
-
-dnf install redis -y &>>$LOG_FILE
-VERIFY $? "Installing Redis"
-
-sed -i -e "s/127.0.0.1/0.0.0.0/" -e "/protected-mode/ c protected-mode no" /etc/redis/redis.conf
-VERIFY $? "Editing conf file to enable remote connections"
-
-systemctl enable redis &>>$LOG_FILE
-systemctl start redis &>>$LOG_FILE
-VERIFY $? "Starting Redis"
+systemctl enable mysqld &>>$LOG_FILE
+systemctl start mysqld &>>$LOG_FILE
+VERIFY $? "Starting mysql"
 
 END_TIME=$(date +%s)
 TOTAL_TIME=$(( $END_TIME - $START_TIME ))
