@@ -30,6 +30,7 @@ VERIFY(){
     else 
         echo -e "$2 is ...$R FAILURE $N" | tee -a $LOG_FILE
         exit 1
+    fi
 }
 
 dnf install python3 gcc python3-devel -y &>>$LOG_FILE
