@@ -12,7 +12,7 @@ SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 SCRIPT_DIR=$PWD
 
-mkdir -p $LOGS_FOLDER &>>$LOG_FILE
+mkdir -p $LOGS_FOLDER 
 echo -e "Script started executing at : $Y $(date) $N" | tee -a $LOG_FILE
 
 if [ $USERID -ne 0 ]
