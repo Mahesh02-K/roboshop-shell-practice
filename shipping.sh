@@ -76,8 +76,7 @@ VERIFY $? "Starting Shipping service"
 dnf install mysql -y &>>$LOG_FILE
 VERIFY $? "Installing Mysql"
 
-
-mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
+mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE
 if [ $? -ne 0 ]
 then
     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
@@ -91,21 +90,6 @@ then
 else
     echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
 fi
-
-# mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities;' &>> $LOG_FILE
-# # If the connection failed (meaning the 'cities' database likely doesn't exist)
-# if [ $? -ne 0 ] 
-#     then
-#     echo -e "Database 'cities' not found,$G Creating $N and $Y loading data $N..." | tee -a $LOG_FILE
-#     # Execute the SQL scripts to create the schema, user, and load master data
-#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>> $LOG_FILE
-#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>> $LOG_FILE
-#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>> $LOG_FILE
-#     VERIFY $? "Loading data"
-#     echo -e "$Y Data loaded successfully! $N" | tee -a $LOG_FILE
-# else
-#     echo -e "$Y Data is already loaded $N" | tee -a $LOG_FILE
-# fi
 
 systemctl restart shipping &>>$LOG_FILE
 VERIFY $? "Restarting the shipping service"
