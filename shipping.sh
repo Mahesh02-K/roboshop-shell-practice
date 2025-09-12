@@ -95,14 +95,9 @@ if [ $? -ne 0 ]
     echo -e "Database 'cities' not found,$G Creating $N and $Y loading data $N..." | tee -a $LOG_FILE
     # Execute the SQL scripts to create the schema, user, and load master data
     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>> $LOG_FILE
-    VERIFY $? "Loading schema"
-
     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>> $LOG_FILE
-    VERIFY $? "Creating app user"
-
     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>> $LOG_FILE
-    VERIFY $? "Loading master data"
-
+    VERIFY $? "Loading data"
     echo -e "$Y Data loaded successfully! $N" | tee -a $LOG_FILE
 else
     echo -e "$Y Data is already loaded $N" | tee -a $LOG_FILE
