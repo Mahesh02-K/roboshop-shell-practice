@@ -94,7 +94,7 @@ VERIFY $? "Installing Mysql"
 
 # Check if database 'cities' exists
 DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE | grep cities)
-if [ $DB_EXISTS -ne 0 ]
+if [ $DB_EXISTS -ne "cities" ]
 then
     echo -e "Database 'cities' $R Does not exist. Creating and loading... $N" | tee -a $LOG_FILE
 
