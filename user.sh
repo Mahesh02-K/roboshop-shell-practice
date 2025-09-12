@@ -29,7 +29,7 @@ VERIFY(){
         echo -e "$2 is ... $G SUCCESS $N" | tee -a $LOG_FILE
     else
         echo -e "$2 is ... $R FAILURE $N" | tee -a $LOG_FILE
-        exit    exit 1 #give other than 0 upto 127
+        exit 1 #give other than 0 upto 127
     fi 
 }
 
