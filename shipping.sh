@@ -76,12 +76,13 @@ VERIFY $? "Starting Shipping service"
 dnf install mysql -y &>>$LOG_FILE
 VERIFY $? "Installing Mysql"
 
+
 mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
 if [ $? -ne 0 ]
 then
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities  < /app/db/schema.sql &>>$LOG_FILE
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities  < /app/db/app-user.sql &>>$LOG_FILE
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/master-data.sql &>>$LOG_FILE
     VERIFY $? "Loading data"
 else
     echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
