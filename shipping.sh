@@ -94,7 +94,13 @@ VERIFY $? "Installing Mysql"
 
 # Check if database 'cities' exists
 DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE | grep cities)
-if [ $DB_EXISTS != "cities" ]
+if [ -z "$DB_EXISTS" ] 
+#In shell scripting (like Bash), the unary operator -z is used to test if a string has a length of zero.
+#The -z operator is used inside test constructs, such as if [ ... ] or [[ ... ]].
+# Returns true if the string's length is zero.
+# Returns false if the string contains any characters (including whitespace).
+# The "z" is a mnemonic for zero.
+
 then
     echo -e "Database 'cities' $R Does not exist. Creating and loading... $N" | tee -a $LOG_FILE
 
