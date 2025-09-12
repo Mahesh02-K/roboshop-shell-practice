@@ -57,10 +57,8 @@ fi
 curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip &>>$LOG_FILE
 VERIFY $? "Downloading user content"
 
-rm -rf /app/* &>>$LOG_FILE
-VERIFY "Removing default content in app directory"
-
-cd /app &>>$LOG_FILE
+rm -rf /app/* 
+cd /app 
 unzip /tmp/user.zip &>>$LOG_FILE
 VERIFY $? "Unzipping user content"
 
