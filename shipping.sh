@@ -76,9 +76,28 @@ VERIFY $? "Starting Shipping service"
 dnf install mysql -y &>>$LOG_FILE
 VERIFY $? "Installing Mysql"
 
-mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE
-if [ $? -ne 0 ]
+# mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
+# if [ $? -ne 0 ]
+# then
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
+#     VERIFY $? "Loading schema"
+
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
+#     VERIFY $? "Creating app user"
+
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
+#     VERIFY $? "Loading data"
+# else
+#     echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
+# fi
+
+
+# Check if database 'cities' exists
+DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE | grep cities)
+if [ $DB_EXISTS -ne 0 ]
 then
+    echo -e "Database 'cities' $R Does not exist. Creating and loading... $N" | tee -a $LOG_FILE
+
     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
     VERIFY $? "Loading schema"
 
@@ -88,7 +107,7 @@ then
     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
     VERIFY $? "Loading data"
 else
-    echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
+  echo -e "Database 'cities' $Y Already exists. Skipping load. $N" | tee -a $LOG_FILE
 fi
 
 systemctl restart shipping &>>$LOG_FILE
