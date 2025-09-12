@@ -39,7 +39,7 @@ VERIFY $? "Disabling default Nodejs"
 dnf module enable nodejs:20 -y &>>$LOG_FILE
 VERIFY $? "Enabling Nodejs version 20"
 
-dnf install nodejs:20 -y &>>$LOG_FILE
+dnf install nodejs -y &>>$LOG_FILE
 VERIFY $? "Instaling Nodejs:20"
 
 mkdir -p /app &>>$LOG_FILE
