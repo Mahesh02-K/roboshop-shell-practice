@@ -76,7 +76,7 @@ systemctl start user &>>$LOG_FILE
 VERIFY $? "Starting User"
 
 END_TIME=$(date +%s)
-TOTAL_TIME=$(( $END_TIME - $TOTAL_TIME ))
+TOTAL_TIME=$(( $END_TIME - $START_TIME ))
 
 echo -e "Script execution completed successfully, $Y Time taken : $TOTAL_TIME secs $Y" | tee -a $LOG_FILE
 
