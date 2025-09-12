@@ -76,21 +76,19 @@ VERIFY $? "Starting Shipping service"
 dnf install mysql -y &>>$LOG_FILE
 VERIFY $? "Installing Mysql"
 
-DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -sse "SHOW DATABASES LIKE 'cities';")
-if [ "$DB_EXISTS" != "cities" ]; then
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'CREATE DATABASE cities;' &>> "$LOG_FILE"
-    VERIFY $? "Creating cities database"
+mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
+if [ $? -ne 0 ]
+then
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
+    VERIFY $? "Loading schema"
 
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/schema.sql &>> "$LOG_FILE"
-    VERIFY $? "Loading schema.sql"
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
+    VERIFY $? "Creating app user"
 
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/app-user.sql &>> "$LOG_FILE"
-    VERIFY $? "Loading app-user.sql"
-
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/master-data.sql &>> "$LOG_FILE"
-    VERIFY $? "Loading master-data.sql"
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
+    VERIFY $? "Loading data"
 else
-    echo -e "Database data is $Y already loaded $N, skipping..." | tee -a "$LOG_FILE"
+    echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
 fi
 
 systemctl restart shipping &>>$LOG_FILE
@@ -101,21 +99,22 @@ TOTAL_TIME=$(( $END_TIME - $START_TIME ))
 
 echo -e "Script execution completed successfully, $Y TIME TAKEN : $TOTAL_TIME sec $N" | tee -a $LOGS_FILE
 
-# mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
-# if [ $? -ne 0 ]
-# then
-#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
-#     VERIFY $? "Loading schema"
+# DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -sse "SHOW DATABASES LIKE 'cities';")
+# if [ "$DB_EXISTS" != "cities" ]; then
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'CREATE DATABASE cities;' &>> "$LOG_FILE"
+#     VERIFY $? "Creating cities database"
 
-#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
-#     VERIFY $? "Creating app user"
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/schema.sql &>> "$LOG_FILE"
+#     VERIFY $? "Loading schema.sql"
 
-#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
-#     VERIFY $? "Loading data"
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/app-user.sql &>> "$LOG_FILE"
+#     VERIFY $? "Loading app-user.sql"
+
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD cities < /app/db/master-data.sql &>> "$LOG_FILE"
+#     VERIFY $? "Loading master-data.sql"
 # else
-#     echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
+#     echo -e "Database data is $Y already loaded $N, skipping..." | tee -a "$LOG_FILE"
 # fi
-
 
 # Check if database 'cities' exists
 # DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE | grep cities)
