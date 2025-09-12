@@ -76,6 +76,23 @@ VERIFY $? "Starting Shipping service"
 dnf install mysql -y &>>$LOG_FILE
 VERIFY $? "Installing Mysql"
 
+DB_EXISTS=$(mysql -h mysql.kakuturu.store -u root -p$MYSQL_ROOT_PASSWORD -sse "SHOW DATABASES LIKE 'cities';")
+if [ "$DB_EXISTS" != "cities" ]; then
+    mysql -h mysql.kakuturu.store -u root -p$MYSQL_ROOT_PASSWORD -e 'CREATE DATABASE cities;' &>> "$LOG_FILE"
+    VERIFY $? "Creating cities database"
+
+    mysql -h mysql.kakuturu.store -u root -p$MYSQL_ROOT_PASSWORD cities < /app/db/schema.sql &>> "$LOG_FILE"
+    VERIFY $? "Loading schema.sql"
+
+    mysql -h mysql.kakuturu.store -u root -p$MYSQL_ROOT_PASSWORD cities < /app/db/app-user.sql &>> "$LOG_FILE"
+    VERIFY $? "Loading app-user.sql"
+
+    mysql -h mysql.kakuturu.store -u root -p$MYSQL_ROOT_PASSWORD cities < /app/db/master-data.sql &>> "$LOG_FILE"
+    VERIFY $? "Loading master-data.sql"
+else
+    echo -e "Database data is $Y already loaded $N, skipping..." | tee -a "$LOG_FILE"
+fi
+
 # mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
 # if [ $? -ne 0 ]
 # then
@@ -93,28 +110,28 @@ VERIFY $? "Installing Mysql"
 
 
 # Check if database 'cities' exists
-DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE | grep cities)
-if [ -z "$DB_EXISTS" ];
-#In shell scripting (like Bash), the unary operator -z is used to test if a string has a length of zero.
-#The -z operator is used inside test constructs, such as if [ ... ] or [[ ... ]].
-# Returns true if the string's length is zero.
-# Returns false if the string contains any characters (including whitespace).
-# The "z" is a mnemonic for zero.
+# DB_EXISTS=$(mysql -h mysql.kakuturu.store -uroot -p$$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES LIKE 'cities';" &>>$LOG_FILE | grep cities)
+# if [ -z "$DB_EXISTS" ]
+# #In shell scripting (like Bash), the unary operator -z is used to test if a string has a length of zero.
+# #The -z operator is used inside test constructs, such as if [ ... ] or [[ ... ]].
+# # Returns true if the string's length is zero.
+# # Returns false if the string contains any characters (including whitespace).
+# # The "z" is a mnemonic for zero.
 
-then
-    echo -e "Database 'cities' $R Does not exist. Creating and loading... $N" | tee -a $LOG_FILE
+# then
+#     echo -e "Database 'cities' $R Does not exist. Creating and loading... $N" | tee -a $LOG_FILE
 
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
-    VERIFY $? "Loading schema"
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
+#     VERIFY $? "Loading schema"
 
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
-    VERIFY $? "Creating app user"
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
+#     VERIFY $? "Creating app user"
 
-    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
-    VERIFY $? "Loading data"
-else
-  echo -e "Database 'cities' $Y Already exists. Skipping load. $N" | tee -a $LOG_FILE
-fi
+#     mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
+#     VERIFY $? "Loading data"
+# else
+#   echo -e "Database 'cities' $Y Already exists. Skipping load. $N" | tee -a $LOG_FILE
+# fi
 
 systemctl restart shipping &>>$LOG_FILE
 VERIFY $? "Restarting the shipping service"
