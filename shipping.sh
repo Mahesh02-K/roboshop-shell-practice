@@ -87,8 +87,8 @@ then
 
     # mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
     # VERIFY $? "Loading data"
-        mysql -h $MYSQL_HOST -uroot -pRoboShop@1 < /app/schema/shipping.sql &>> $LOGFILE
-        VERIFY $? "Loading data"
+    mysql -h mysql.kakuturu.store -uroot -p$MYSQL_ROOT_PASSWORD < /app/schema/shipping.sql &>> $LOGFILE
+    VERIFY $? "Loading data"
 else
     echo -e "$Y Data is already Loaded $N" | tee -a $LOGS_FILE
 fi
