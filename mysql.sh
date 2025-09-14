@@ -23,6 +23,9 @@ else
     echo -e "$G SUCCESS ::: $N YOU ARE RUNNING WITH ROOT ACCESS" | tee -a $LOG_FILE
 fi
 
+echo "Please enter password to setup"
+read -s MYSQL_ROOT_PASSWORD
+
 VERIFY(){
     if [ $1 -eq 0 ]
     then
@@ -39,6 +42,9 @@ VERIFY $? "Installing mysql"
 systemctl enable mysqld &>>$LOG_FILE
 systemctl start mysqld &>>$LOG_FILE
 VERIFY $? "Starting mysql"
+
+mysql_secure_installation --set-root-pass $MYSQL_ROOT_PASSWORD &>>$LOG_FILE
+VERIFY $? "Setting MySQL root password"
 
 END_TIME=$(date +%s)
 TOTAL_TIME=$(( $END_TIME - $START_TIME ))
